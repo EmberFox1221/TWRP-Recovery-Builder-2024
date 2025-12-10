@@ -85,7 +85,7 @@ jobs:
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
-        swap-size-gb: 24
+        swap-size-gb: 6
         
     - name: Prepare the environment
       run: |
@@ -126,7 +126,18 @@ jobs:
     - name: Repo Sync
       run: |
         cd workspace
-        repo sync -j$(nproc --all) --force-sync
+        repo sync -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --depth=1
+
+
+    - name: Free space after sync
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo rm -rf /usr/lib/jvm/*
+        docker system prune -af || true
+
 
     - name: Clone Device Tree
       run: |
